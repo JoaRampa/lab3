@@ -6,9 +6,24 @@
   </div>
   <div class="component">
     <div class="investments">
-      <div>Gastos por compras y ventas: {{ calculateInvestment() }}</div>
-      <div>Poseciones: {{ totalCash }}</div>
-      <div>Total Ganancias/Perdidas= {{ calculateTotalProfit() }}</div>
+      <div class="infoProfit">
+        <h2><img style="width: 30px" src="@/assets/profit.png" /></h2>
+        <h2><img style="width: 30px" src="@/assets/buys.png" /></h2>
+        <h2><img style="width: 30px" src="@/assets/sale.png" /></h2>
+        <h2><img style="width: 30px" src="@/assets/arrow.png" /></h2>
+      </div>
+      <div class="infoProfit">
+        <p>Poseciones:</p>
+        <p>Gastos por compras</p>
+        <p>Retornos por ventas</p>
+        <p>Total Profit:</p>
+      </div>
+      <div class="infoProfit">
+        <p>$ {{ totalCash }}</p>
+        <p>$ {{ calculateBuys() }}</p>
+        <p>$ {{ calculateSale() }}</p>
+        <p>$ {{ calculateTotalProfit() }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -38,22 +53,27 @@ export default {
   methods: {
     ...mapActions("transactions", ["getState"]),
     ...mapActions("transactions", ["getHistory"]),
-    calculateInvestment() {
+    calculateBuys() {
       let buys = 0;
-      let sales = 0;
-
       for (let index = 0; index < this.transactions.length; index++) {
         let transaction = this.transactions[index];
 
         if (transaction.action === "purchase") {
           buys -= transaction.money;
-        } else if (transaction.action === "sale") {
+        }
+      }
+      return buys;
+    },
+    calculateSale() {
+      let sales = 0;
+      for (let index = 0; index < this.transactions.length; index++) {
+        let transaction = this.transactions[index];
+
+        if (transaction.action === "sale") {
           sales += transaction.money;
         }
       }
-
-      let invTotal = buys + sales;
-      return invTotal;
+      return sales;
     },
     calculateCash(amount, cryptoCode) {
       const code = cryptoCode.toUpperCase();
@@ -68,10 +88,11 @@ export default {
       }
     },
     calculateTotalProfit() {
-      let totalInvestments = this.calculateInvestment();
+      let totalBuys = this.calculateBuys();
+      let totalSales = this.calculateSale();
       let totalCashValue = this.totalCash;
 
-      let totalProfit = totalInvestments + totalCashValue;
+      let totalProfit = totalBuys + totalSales + totalCashValue;
       return totalProfit.toFixed(2);
     },
     async fetchData() {
@@ -101,9 +122,18 @@ export default {
 }
 
 .investments {
-  width: 50%;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
   border: 1px solid #35314a;
   border-radius: 15px;
-  padding: 15px;
+}
+
+.infoProfit {
+  padding: 30px;
+}
+
+.infoProfit p {
+  margin: 15px 0px 20px;
 }
 </style>
